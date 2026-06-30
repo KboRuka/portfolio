@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ทศวรรษ คำบุญเรือง | Cybersecurity Portfolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        /* ===== RESET & BASE ===== */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --neon-green: #00ff41;
+            --neon-cyan: #00d4ff;
+            --neon-purple: #b400ff;
+            --neon-red: #ff0040;
+            --dark-bg: #0a0a0a;
+            --dark-card: #0d0d0d;
+            --dark-border: #1a1a1a;
+            --text-dim: #4a4a4a;
+            --text-mid: #888;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background: var(--dark-bg);
+            color: var(--neon-green);
+            overflow-x: hidden;
+            cursor: crosshair;
+        }
+
+        ::selection {
+            background: var(--neon-green);
+            color: var(--dark-bg);
+        }
+
+        /* ===== SCAN LINE OVERLAY ===== */
+        .scanline-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.03) 0px,
+                rgba(0, 0, 0, 0.03) 1px,
+                transparent 1px,
+                transparent 3px
+            );
+        }
+
+        .scanline-overlay::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: linear-gradient(
+                transparent 50%,
+                rgba(0, 255, 65, 0.015) 50%
+            );
+            background-size: 100% 4px;
+            animation: scanMove 8s linear infinite;
+        }
+
+        @keyframes scanMove {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(100px); }
+        }
+
+        /* ===== MATRIX RAIN CANVAS ===== */
+        #matrix-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            opacity: 0.12;
+        }
+
+        /* ===== NAVIGATION ===== */
+        .nav-bar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            padding: 16px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--dark-border);
+        }
+
+        .nav-logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+            font-weight: 900;
+            color: var(--neon-green);
+            text-shadow: 0 0 10px var(--neon-green), 0 0 30px rgba(0, 255, 65, 0.3);
+            letter-spacing: 3px;
+        }
+
+        .nav-logo .blink {
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-mid);
+            text-decoration: none;
+            font-size: 13px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .nav-links a::before {
+            content: '> ';
+            opacity: 0;
+            transition: opacity 0.3s;
+            color: var(--neon-green);
+        }
+
+        .nav-links a:hover {
+            color: var(--neon-green);
+            text-shadow: 0 0 8px var(--neon-green);
+        }
+
+        .nav-links a:hover::before {
+            opacity: 1;
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .hamburger span {
+            width: 28px;
+            height: 2px;
+            background: var(--neon-green);
+            transition: all 0.3s;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -5px);
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== HERO SECTION ===== */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 120px 24px 80px;
+            position: relative;
+        }
+
+        .hero-terminal {
+            border: 1px solid var(--dark-border);
+            border-radius: 12px;
+            overflow: hidden;
+            max-width: 800px;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.9);
+            box-shadow: 0 0 60px rgba(0, 255, 65, 0.05), 0 25px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .terminal-header {
+            background: #111;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid var(--dark-border);
+        }
+
+        .terminal-dot {
+            width: 12px; height: 12px;
+            border-radius: 50%;
+        }
+
+        .terminal-dot.red { background: #ff5f57; }
+        .terminal-dot.yellow { background: #febc2e; }
+        .terminal-dot.green { background: #28c840; }
+
+        .terminal-title {
+            margin-left: 12px;
+            color: var(--text-dim);
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+
+        .terminal-body {
+            padding: 40px;
+        }
+
+        .terminal-line {
+            margin-bottom: 8px;
+            font-size: 15px;
+            line-height: 1.8;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: lineAppear 0.5s forwards;
+        }
+
+        .terminal-line .prompt {
+            color: var(--neon-cyan);
+            margin-right: 8px;
+        }
+
+        .terminal-line .command {
+            color: var(--neon-green);
+        }
+
+        .terminal-line .output {
+            color: var(--text-mid);
+        }
+
+        .terminal-line .highlight {
+            color: var(--neon-cyan);
+        }
+
+        /* Glitch Name */
+        .glitch-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(32px, 6vw, 56px);
+            font-weight: 900;
+            color: var(--neon-green);
+            text-shadow: 0 0 10px var(--neon-green), 0 0 40px rgba(0, 255, 65, 0.3);
+            position: relative;
+            display: inline-block;
+            margin: 20px 0;
+            animation: lineAppear 0.5s 2.5s forwards;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        .glitch-name::before,
+        .glitch-name::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+        }
+
+        .glitch-name::before {
+            color: var(--neon-cyan);
+            z-index: -1;
+            animation: glitch1 3s infinite linear alternate-reverse;
+        }
+
+        .glitch-name::after {
+            color: var(--neon-red);
+            z-index: -2;
+            animation: glitch2 2s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch1 {
+            0%, 90%, 100% { clip-path: inset(0 0 0 0); transform: translate(0); }
+            92% { clip-path: inset(20% 0 40% 0); transform: translate(-4px, 2px); }
+            94% { clip-path: inset(60% 0 10% 0); transform: translate(4px, -2px); }
+            96% { clip-path: inset(40% 0 30% 0); transform: translate(-2px, 1px); }
+            98% { clip-path: inset(10% 0 70% 0); transform: translate(2px, -1px); }
+        }
+
+        @keyframes glitch2 {
+            0%, 88%, 100% { clip-path: inset(0 0 0 0); transform: translate(0); }
+            90% { clip-path: inset(50% 0 20% 0); transform: translate(3px, -1px); }
+            93% { clip-path: inset(10% 0 60% 0); transform: translate(-3px, 2px); }
+            96% { clip-path: inset(70% 0 5% 0); transform: translate(2px, 1px); }
+        }
+
+        @keyframes lineAppear {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .typing-cursor {
+            display: inline-block;
+            width: 10px;
+            height: 20px;
+            background: var(--neon-green);
+            margin-left: 4px;
+            animation: blink 0.8s step-end infinite;
+            vertical-align: middle;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            border: 1px solid var(--neon-green);
+            border-radius: 4px;
+            font-size: 13px;
+            color: var(--neon-green);
+            margin-top: 20px;
+            opacity: 0;
+            animation: lineAppear 0.5s 3s forwards;
+            transform: translateY(10px);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .hero-badge .pulse-dot {
+            width: 8px; height: 8px;
+            background: var(--neon-green);
+            border-radius: 50%;
+            animation: pulseDot 2s infinite;
+        }
+
+        @keyframes pulseDot {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(0, 255, 65, 0.6); }
+            50% { box-shadow: 0 0 0 8px rgba(0, 255, 65, 0); }
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-dim);
+            font-size: 11px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .scroll-indicator i {
+            font-size: 18px;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(10px); }
+        }
+
+        /* ===== SECTION STYLES ===== */
+        .section {
+            padding: 100px 24px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            margin-bottom: 60px;
+        }
+
+        .section-tag {
+            font-size: 11px;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-tag::before {
+            content: '';
+            width: 30px;
+            height: 1px;
+            background: var(--neon-cyan);
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(28px, 4vw, 40px);
+            font-weight: 700;
+            color: #e0e0e0;
+            text-shadow: 0 0 20px rgba(0, 255, 65, 0.1);
+        }
+
+        .section-title .hash {
+            color: var(--neon-green);
+            margin-right: 8px;
+        }
+
+        /* ===== ABOUT SECTION ===== */
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        .about-text p {
+            color: var(--text-mid);
+            font-size: 15px;
+            line-height: 2;
+            margin-bottom: 20px;
+        }
+
+        .about-text p .green {
+            color: var(--neon-green);
+        }
+
+        .about-text p .cyan {
+            color: var(--neon-cyan);
+        }
+
+        .about-info-card {
+            border: 1px solid var(--dark-border);
+            border-radius: 8px;
+            overflow: hidden;
+            background: var(--dark-card);
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--dark-border);
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-row:hover {
+            background: rgba(0, 255, 65, 0.03);
+            border-color: rgba(0, 255, 65, 0.15);
+        }
+
+        .info-row .label {
+            color: var(--text-dim);
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 2px;
+        }
+
+        .info-row .value {
+            color: var(--neon-green);
+        }
+
+        /* ===== SKILLS SECTION ===== */
+        .skills-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .skill-card {
+            border: 1px solid var(--dark-border);
+            border-radius: 8px;
+            padding: 28px;
+            background: var(--dark-card);
+            transition: all 0.4s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .skill-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 2px;
+            background: linear-gradient(90deg, var(--neon-green), var(--neon-cyan));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s;
+        }
+
+        .skill-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .skill-card:hover {
+            border-color: rgba(0, 255, 65, 0.2);
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.05);
+            transform: translateY(-4px);
+        }
+
+        .skill-icon {
+            font-size: 28px;
+            margin-bottom: 16px;
+            color: var(--neon-green);
+            text-shadow: 0 0 15px var(--neon-green);
+        }
+
+        .skill-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: #e0e0e0;
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+
+        .skill-bar-track {
+            width: 100%;
+            height: 4px;
+            background: var(--dark-border);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .skill-bar-fill {
+            height: 100%;
+            border-radius: 2px;
+            background: linear-gradient(90deg, var(--neon-green), var(--neon-cyan));
+            box-shadow: 0 0 10px var(--neon-green);
+            width: 0;
+            transition: width 1.5s ease-out;
+        }
+
+        .skill-level {
+            font-size: 11px;
+            color: var(--text-dim);
+            margin-top: 8px;
+            text-align: right;
+            letter-spacing: 1px;
+        }
+
+        /* ===== ROADMAP SECTION ===== */
+        .roadmap {
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .roadmap::before {
+            content: '';
+            position: absolute;
+            left: 12px;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: linear-gradient(180deg, var(--neon-green), var(--neon-cyan), var(--neon-purple), transparent);
+        }
+
+        .roadmap-item {
+            position: relative;
+            margin-bottom: 50px;
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: all 0.6s;
+        }
+
+        .roadmap-item.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .roadmap-dot {
+            position: absolute;
+            left: -34px;
+            top: 6px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 2px solid var(--neon-green);
+            background: var(--dark-bg);
+            z-index: 1;
+        }
+
+        .roadmap-item.active .roadmap-dot {
+            background: var(--neon-green);
+            box-shadow: 0 0 15px var(--neon-green), 0 0 30px rgba(0, 255, 65, 0.3);
+            animation: pulseDot 2s infinite;
+        }
+
+        .roadmap-item.future .roadmap-dot {
+            border-color: var(--text-dim);
+        }
+
+        .roadmap-phase {
+            font-size: 11px;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 8px;
+        }
+
+        .roadmap-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: #e0e0e0;
+            margin-bottom: 10px;
+        }
+
+        .roadmap-item.active .roadmap-title {
+            color: var(--neon-green);
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+        }
+
+        .roadmap-desc {
+            color: var(--text-mid);
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .roadmap-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border: 1px solid var(--dark-border);
+            border-radius: 3px;
+            font-size: 11px;
+            color: var(--text-dim);
+            margin-top: 12px;
+            margin-right: 6px;
+            letter-spacing: 1px;
+        }
+
+        .roadmap-item.active .roadmap-tag {
+            border-color: rgba(0, 255, 65, 0.2);
+            color: var(--neon-green);
+        }
+
+        /* ===== TIMELINE / JOURNEY ===== */
+        .journey-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .journey-card {
+            border: 1px solid var(--dark-border);
+            border-radius: 8px;
+            padding: 32px;
+            background: var(--dark-card);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s;
+        }
+
+        .journey-card:hover {
+            border-color: rgba(0, 255, 65, 0.2);
+            transform: translateY(-4px);
+        }
+
+        .journey-card .card-number {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 64px;
+            font-weight: 900;
+            color: rgba(0, 255, 65, 0.04);
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            line-height: 1;
+        }
+
+        .journey-card .card-icon {
+            font-size: 24px;
+            color: var(--neon-cyan);
+            margin-bottom: 16px;
+        }
+
+        .journey-card h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: #e0e0e0;
+            margin-bottom: 12px;
+        }
+
+        .journey-card p {
+            color: var(--text-mid);
+            font-size: 13px;
+            line-height: 1.9;
+        }
+
+        .journey-card .arrow-icon {
+            position: absolute;
+            bottom: 16px;
+            right: 20px;
+            color: var(--text-dim);
+            font-size: 18px;
+            transition: all 0.3s;
+        }
+
+        .journey-card:hover .arrow-icon {
+            color: var(--neon-green);
+            transform: translateX(4px);
+        }
+
+        /* ===== STATS BAR ===== */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background: var(--dark-border);
+            border: 1px solid var(--dark-border);
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 0 24px;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .stat-item {
+            background: var(--dark-card);
+            padding: 32px 24px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .stat-item:hover {
+            background: rgba(0, 255, 65, 0.03);
+        }
+
+        .stat-number {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--neon-green);
+            text-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* ===== CONTACT SECTION ===== */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .contact-text p {
+            color: var(--text-mid);
+            font-size: 15px;
+            line-height: 2;
+            margin-bottom: 30px;
+        }
+
+        .contact-links {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .contact-link {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            border: 1px solid var(--dark-border);
+            border-radius: 6px;
+            text-decoration: none;
+            color: var(--text-mid);
+            font-size: 14px;
+            transition: all 0.3s;
+            background: var(--dark-card);
+        }
+
+        .contact-link:hover {
+            border-color: var(--neon-green);
+            color: var(--neon-green);
+            background: rgba(0, 255, 65, 0.03);
+            transform: translateX(8px);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.05);
+        }
+
+        .contact-link i {
+            font-size: 20px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--dark-border);
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+
+        .contact-link:hover i {
+            border-color: var(--neon-green);
+            color: var(--neon-green);
+            text-shadow: 0 0 10px var(--neon-green);
+        }
+
+        .contact-link .link-label {
+            font-size: 11px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 2px;
+        }
+
+        .contact-link .link-value {
+            color: inherit;
+        }
+
+        .contact-terminal {
+            border: 1px solid var(--dark-border);
+            border-radius: 8px;
+            overflow: hidden;
+            background: var(--dark-card);
+        }
+
+        .contact-terminal .terminal-header {
+            background: #111;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid var(--dark-border);
+        }
+
+        .contact-terminal .terminal-body {
+            padding: 24px;
+        }
+
+        .contact-terminal .terminal-body p {
+            color: var(--text-mid);
+            font-size: 14px;
+            line-height: 2;
+        }
+
+        .contact-terminal .terminal-body .green { color: var(--neon-green); }
+        .contact-terminal .terminal-body .cyan { color: var(--neon-cyan); }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            border-top: 1px solid var(--dark-border);
+            padding: 40px 24px;
+            text-align: center;
+        }
+
+        .footer-text {
+            color: var(--text-dim);
+            font-size: 12px;
+            letter-spacing: 2px;
+        }
+
+        .footer-text .green {
+            color: var(--neon-green);
+        }
+
+        /* ===== SCROLL REVEAL ===== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ===== DIVIDER ===== */
+        .section-divider {
+            max-width: 1000px;
+            margin: 0 auto;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--dark-border), transparent);
+        }
+
+        /* ===== MOBILE NAV OVERLAY ===== */
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(10, 10, 10, 0.97);
+            z-index: 999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 32px;
+        }
+
+        .mobile-nav.active {
+            display: flex;
+        }
+
+        .mobile-nav a {
+            color: var(--neon-green);
+            text-decoration: none;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 4px;
+            transition: all 0.3s;
+        }
+
+        .mobile-nav a:hover {
+            text-shadow: 0 0 20px var(--neon-green);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .hamburger { display: flex; }
+
+            .about-grid,
+            .skills-container,
+            .journey-cards,
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-bar {
+                grid-template-columns: 1fr 1fr;
+                margin: 0 16px;
+            }
+
+            .section { padding: 60px 16px; }
+
+            .terminal-body { padding: 24px; }
+
+            .glitch-name { font-size: clamp(24px, 8vw, 40px); }
+        }
+
+        @media (max-width: 480px) {
+            .stats-bar {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-badge {
+                font-size: 11px;
+                padding: 6px 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Scanline Overlay -->
+    <div class="scanline-overlay"></div>
+
+    <!-- Matrix Rain -->
+    <canvas id="matrix-canvas"></canvas>
+
+    <!-- Mobile Nav -->
+    <div class="mobile-nav" id="mobileNav">
+        <a href="#about" onclick="closeMobileNav()">ABOUT</a>
+        <a href="#skills" onclick="closeMobileNav()">SKILLS</a>
+        <a href="#roadmap" onclick="closeMobileNav()">ROADMAP</a>
+        <a href="#journey" onclick="closeMobileNav()">JOURNEY</a>
+        <a href="#contact" onclick="closeMobileNav()">CONTACT</a>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="nav-bar">
+        <div class="nav-logo">THOSAWAT<span class="blink">_</span></div>
+        <ul class="nav-links">
+            <li><a href="#about">About</a></li>
+            <li><a href="#skills">Skills</a></li>
+            <li><a href="#roadmap">Roadmap</a></li>
+            <li><a href="#journey">Journey</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+        <div class="hamburger" id="hamburger" onclick="toggleMobileNav()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
+
+    <!-- Content -->
+    <div class="content-wrapper">
+
+        <!-- HERO -->
+        <section class="hero" id="hero">
+            <div class="hero-terminal">
+                <div class="terminal-header">
+                    <div class="terminal-dot red"></div>
+                    <div class="terminal-dot yellow"></div>
+                    <div class="terminal-dot green"></div>
+                    <span class="terminal-title">guest@cyber-portfolio:~</span>
+                </div>
+                <div class="terminal-body">
+                    <div class="terminal-line" style="animation-delay: 0.3s">
+                        <span class="prompt">$</span>
+                        <span class="command">whoami</span>
+                    </div>
+                    <div class="terminal-line" style="animation-delay: 0.8s">
+                        <span class="output">ทศวรรษ คำบุญเรือง — Aspiring Cybersecurity Professional</span>
+                    </div>
+                    <div class="terminal-line" style="animation-delay: 1.3s">
+                        <span class="prompt">$</span>
+                        <span class="command">cat /etc/university</span>
+                    </div>
+                    <div class="terminal-line" style="animation-delay: 1.8s">
+                        <span class="output">มหาวิทยาลัยสวนดุสิต — <span class="highlight">Year 1</span></span>
+                    </div>
+                    <div class="terminal-line" style="animation-delay: 2.3s">
+                        <span class="prompt">$</span>
+                        <span class="command">echo $CAREER_GOAL</span>
+                    </div>
+                    <div class="terminal-line" style="animation-delay: 2.8s">
+                        <span class="output">Security Analyst T1 → <span class="highlight">Purple Team</span></span>
+                        <span class="typing-cursor"></span>
+                    </div>
+                    <div style="text-align: center; margin-top: 10px;">
+                        <div class="glitch-name" data-text="THOSAWAT">THOSAWAT</div>
+                        <div class="hero-badge">
+                            <span class="pulse-dot"></span>
+                            10 Months in Cybersecurity
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="scroll-indicator">
+                <span>Scroll Down</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+        </section>
+
+        <!-- STATS BAR -->
+        <div class="stats-bar reveal">
+            <div class="stat-item">
+                <div class="stat-number" data-count="10">0</div>
+                <div class="stat-label">Months Learning</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-count="5">0</div>
+                <div class="stat-label">Languages</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-count="2">0</div>
+                <div class="stat-label">Universities</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-count="1">0</div>
+                <div class="stat-label">Mission</div>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- ABOUT -->
+        <section class="section" id="about">
+            <div class="section-header reveal">
+                <div class="section-tag">Profile</div>
+                <h2 class="section-title"><span class="hash">#</span>ABOUT_ME</h2>
+            </div>
+            <div class="about-grid">
+                <div class="about-text reveal">
+                    <p>
+                        สวัสดี ผม <span class="green">ทศวรรษ คำบุญเรือง</span> นักศึกษาปีที่ 1
+                        มหาวิทยาลัย<span class="cyan">สวนดุสิต</span>
+                        ที่กำลังก้าวเข้าสู่โลกของ Cybersecurity อย่างเต็มตัว
+                    </p>
+                    <p>
+                        เริ่มต้นศึกษาด้าน Cybersecurity มาแล้ว <span class="green">10 เดือน</span>
+                        จากคนที่เคยศึกษาอยู่มหาวิทยาลัยศิลปากร แต่ด้วยความหลงใหลในโลกแห่ง
+                        <span class="cyan">ความปลอดภัยทางไซเบอร์</span> ผมตัดสินใจย้ายมาเรียนที่สวนดุสิต
+                        เพื่อเดินตามเส้นทางที่ใช่
+                    </p>
+                    <p>
+                        เป้าหมายสูงสุด: จาก <span class="green">Security Analyst Tier 1</span>
+                        พัฒนาตัวเองขึ้นเรื่อยๆ จนถึง
+                        <span class="cyan">Purple Team / HR</span> — จุดที่ Offensive และ Defensive
+                        บรรจบกัน
+                    </p>
+                </div>
+                <div class="about-info-card reveal">
+                    <div class="info-row">
+                        <span class="label">Name</span>
+                        <span class="value">ทศวรรษ คำบุญเรือง</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">University</span>
+                        <span class="value">มหาวิทยาลัยสวนดุสิต</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Year</span>
+                        <span class="value">1</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Previous</span>
+                        <span class="value">มหาวิทยาลัยศิลปากร</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Focus</span>
+                        <span class="value">Cybersecurity</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Target Role</span>
+                        <span class="value">Purple Team</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Experience</span>
+                        <span class="value">10 Months</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <!-- SKILLS -->
+        <section class="section" id="skills">
+            <div class="section-header reveal">
+                <div class="section-tag">Arsenal</div>
+                <h2 class="section-title"><span class="hash">#</span>SKILLS</h2>
+            </div>
+            <div class="skills-container">
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fab fa-html5"></i></div>
+                    <div class="skill-name">HTML</div>
+                    <div class="skill-bar-track">
+                        <div class="skill-bar-fill" data-width="65"></div>
+                    </div>
+                    <div class="skill-level">BASIC — 65%</div>
+                </div>
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fab fa-css3-alt"></i></div>
+                    <div class="skill-name">CSS</div>
+                    <div class="skill-bar-track">
+                        <div class="skill-bar-fill" data-width="60"></div>
+                    </div>
+                    <div class="skill-level">BASIC — 60%</div>
+                </div>
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fab fa-js-square"></i></div>
+                    <div class="skill-name">JAVASCRIPT</div>
+                    <div class="skill-bar-track">
+                        <div class="skill-bar-fill" data-width="50"></div>
+                    </div>
+                    <div class="skill-level">BASIC — 50%</div>
+                </div>
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fab fa-python"></i></div>
+                    <div class="skill-name">PYTHON</div>
+                    <div class="skill-bar-track">
+                        <div class="skill-bar-fill" data-width="55"></div>
+                    </div>
+                    <div class="skill-level">BASIC — 55%</div>
+                </div>
+                <div class="skill-card reveal" style="grid-column: 1 / -1;">
+                    <div class="skill-icon"><i class="fas fa-code"></i></div>
+                    <div class="skill-name">C PROGRAMMING</div>
+                    <div class="skill-bar-track">
+                        <div class="skill-bar-fill" data-width="45"></div>
+                    </div>
+                    <div class="skill-level">BASIC — 45%</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <!-- ROADMAP -->
+        <section class="section" id="roadmap">
+            <div class="section-header reveal">
+                <div class="section-tag">Path</div>
+                <h2 class="section-title"><span class="hash">#</span>CAREER_ROADMAP</h2>
+            </div>
+            <div class="roadmap">
+                <div class="roadmap-item active">
+                    <div class="roadmap-dot"></div>
+                    <div class="roadmap-phase">Phase 01 — Current</div>
+                    <div class="roadmap-title">Security Analyst Tier 1</div>
+                    <div class="roadmap-desc">
+                        เริ่มต้นจากการเฝ้าระวัง วิเคราะห์ alerts จาก SIEM
+                        จัดการ incident ระดับเบื้องต้น และสร้างรากฐานความรู้ด้าน cybersecurity ให้แข็งแกร่ง
+                    </div>
+                    <span class="roadmap-tag">SIEM</span>
+                    <span class="roadmap-tag">SOC</span>
+                    <span class="roadmap-tag">Incident Response</span>
+                    <span class="roadmap-tag">Log Analysis</span>
+                </div>
+                <div class="roadmap-item future">
+                    <div class="roadmap-dot"></div>
+                    <div class="roadmap-phase">Phase 02 — Next</div>
+                    <div class="roadmap-title">Security Analyst Tier 2</div>
+                    <div class="roadmap-desc">
+                        วิเคราะห์ภัยคุกคามที่ซับซ้อนขึ้น ทำ Threat Hunting
+                        พัฒนา playbooks และประสานงานกับทีมต่างๆ เพื่อรับมือกับ incident ระดับกลาง
+                    </div>
+                    <span class="roadmap-tag">Threat Hunting</span>
+                    <span class="roadmap-tag">Malware Analysis</span>
+                    <span class="roadmap-tag">Playbook Dev</span>
+                </div>
+                <div class="roadmap-item future">
+                    <div class="roadmap-dot"></div>
+                    <div class="roadmap-phase">Phase 03 — Growth</div>
+                    <div class="roadmap-title">Blue Team / Red Team Specialist</div>
+                    <div class="roadmap-desc">
+                        เลือกเส้นทางเจาะลึก — ฝั่ง Defensive (Blue) หรือ
+                        Offensive (Red) เพื่อสร้างความเชี่ยวชาญระดับสูง
+                    </div>
+                    <span class="roadmap-tag">Penetration Testing</span>
+                    <span class="roadmap-tag">Threat Intel</span>
+                    <span class="roadmap-tag">DFIR</span>
+                </div>
+                <div class="roadmap-item future">
+                    <div class="roadmap-dot"></div>
+                    <div class="roadmap-phase">Phase 04 — Ultimate Goal</div>
+                    <div class="roadmap-title">Purple Team / HR</div>
+                    <div class="roadmap-desc">
+                        จุดบรรจบของทั้งสองโลก — บูรณาการ Offensive และ Defensive
+                        เข้าด้วยกันเพื่อสร้างระบบความปลอดภัยที่สมดุลและแข็งแกร่งที่สุด
+                    </div>
+                    <span class="roadmap-tag">Purple Team</span>
+                    <span class="roadmap-tag">Red+Blue</span>
+                    <span class="roadmap-tag">Strategy</span>
+                    <span class="roadmap-tag">Leadership</span>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <!-- JOURNEY -->
+        <section class="section" id="journey">
+            <div class="section-header reveal">
+                <div class="section-tag">Story</div>
+                <h2 class="section-title"><span class="hash">#</span>MY_JOURNEY</h2>
+            </div>
+            <div class="journey-cards">
+                <div class="journey-card reveal">
+                    <div class="card-number">01</div>
+                    <div class="card-icon"><i class="fas fa-university"></i></div>
+                    <h3>จุดเริ่มต้นที่ศิลปากร</h3>
+                    <p>
+                        เริ่มต้นเส้นทางการศึกษาที่มหาวิทยาลัยศิลปากร
+                        แต่ในระหว่างนั้นได้ค้นพบว่าจริงใจของผมอยู่ที่อีกทิศทางหนึ่ง
+                        — โลกของ Cybersecurity
+                    </p>
+                    <i class="fas fa-arrow-right arrow-icon"></i>
+                </div>
+                <div class="journey-card reveal">
+                    <div class="card-number">02</div>
+                    <div class="card-icon"><i class="fas fa-shield-halved"></i></div>
+                    <h3>ตื่นรู้ถึง Passion</h3>
+                    <p>
+                        เริ่มศึกษา cybersecurity ด้วยตัวเองอย่างจริงจัง
+                        ค้นพบว่าโลกแห่งความปลอดภัยทางไซเบอร์คือสิ่งที่ทำให้หัวใจเต้น
+                        มันเป็นการแข่งขันระหว่างผู้โจมตีและผู้ป้องกัน
+                    </p>
+                    <i class="fas fa-arrow-right arrow-icon"></i>
+                </div>
+                <div class="journey-card reveal">
+                    <div class="card-number">03</div>
+                    <div class="card-icon"><i class="fas fa-arrows-turn-to-dots"></i></div>
+                    <h3>ตัดสินใจย้ายทาง</h3>
+                    <p>
+                        อาจดูกล้าหาญ แต่ผมเชื่อว่าการเดินออกจากเส้นทางที่ไม่ใช่
+                        เพื่อเดินเข้าสู่เส้นทางที่ใช่ ไม่ใช่การถอยหลัง
+                        แต่เป็นการก้าวกระโดดไปข้างหน้า
+                    </p>
+                    <i class="fas fa-arrow-right arrow-icon"></i>
+                </div>
+                <div class="journey-card reveal">
+                    <div class="card-number">04</div>
+                    <div class="card-icon"><i class="fas fa-rocket"></i></div>
+                    <h3>ก้าวต่อไปที่สวนดุสิต</h3>
+                    <p>
+                        มาถึงจุดที่ถูกต้องแล้ว — มหาวิทยาลัยสวนดุสิต
+                        พร้อมเรียนรู้ พัฒนาตัวเอง และไต่เต้าจาก
+                        Security Analyst T1 สู่ Purple Team ให้ได้
+                    </p>
+                    <i class="fas fa-arrow-right arrow-icon"></i>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <!-- CONTACT -->
+        <section class="section" id="contact">
+            <div class="section-header reveal">
+                <div class="section-tag">Connect</div>
+                <h2 class="section-title"><span class="hash">#</span>CONTACT_ME</h2>
+            </div>
+            <div class="contact-grid">
+                <div>
+                    <div class="contact-text reveal">
+                        <p>
+                            หากคุณมีโอกาส คำแนะนำ หรืออยากคุยเรื่อง Cybersecurity
+                            ผมพร้อมเสมอครับ บางทีการเริ่มต้นจากการสนทนาคนเดียว
+                            อาจนำไปสู่โอกาสที่ยิ่งใหญ่ก็ได้
+                        </p>
+                    </div>
+                    <div class="contact-links reveal">
+                        <a href="tel:0830466427" class="contact-link">
+                            <i class="fas fa-phone"></i>
+                            <div>
+                                <div class="link-label">Phone</div>
+                                <div class="link-value">083-046-6427</div>
+                            </div>
+                        </a>
+                        <a href="https://facebook.com/mirko.kawalie" target="_blank" class="contact-link">
+                            <i class="fab fa-facebook-f"></i>
+                            <div>
+                                <div class="link-label">Facebook</div>
+                                <div class="link-value">mirko kawalie</div>
+                            </div>
+                        </a>
+                        <a href="https://instagram.com/boruka_decade" target="_blank" class="contact-link">
+                            <i class="fab fa-instagram"></i>
+                            <div>
+                                <div class="link-label">Instagram</div>
+                                <div class="link-value">boruka_decade</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="contact-terminal reveal">
+                    <div class="terminal-header">
+                        <div class="terminal-dot red"></div>
+                        <div class="terminal-dot yellow"></div>
+                        <div class="terminal-dot green"></div>
+                        <span class="terminal-title">guest@cyber-portfolio:~</span>
+                    </div>
+                    <div class="terminal-body">
+                        <p><span class="green">$</span> cat philosophy.txt</p>
+                        <p style="margin-top: 12px;">
+                            "ในโลกของ Cybersecurity<br>
+                            ไม่มีคำว่า <span class="cyan">'รู้เพียงพอ'</span><br>
+                            ทุกวันคือการเรียนรู้ใหม่<br>
+                            ทุก bug คือบทเรียน<br>
+                            ทุก incident คือโอกาส<br>
+                            และทุกการต่อสู้คือ<spam class="green">การพัฒนา</spam>"
+                        </p>
+                        <p style="margin-top: 16px;">
+                            <span class="green">$</span> <span class="typing-cursor" style="height:16px;width:8px;"></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="footer">
+            <p class="footer-text">
+                &copy; 2025 <span class="green">THOSAWAT K.</span> — ALL RIGHTS RESERVED — BUILT WITH <span class="green">&lt;3</span> AND CURIOSITY
+            </p>
+        </footer>
+
+    </div>
+
+    <script>
+        // ===== MATRIX RAIN =====
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF{}[]<>/\\';
+        const fontSize = 14;
+        let columns = Math.floor(canvas.width / fontSize);
+        let drops = Array(columns).fill(1);
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(10, 10, 10, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#00ff41';
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars.charAt(Math.floor(Math.random() * chars.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(drawMatrix, 50);
+
+        window.addEventListener('resize', () => {
+            columns = Math.floor(canvas.width / fontSize);
+            drops = Array(columns).fill(1);
+        });
+
+        // ===== SCROLL REVEAL =====
+        const revealElements = document.querySelectorAll('.reveal');
+
+        function checkReveal() {
+            const windowHeight = window.innerHeight;
+            revealElements.forEach(el => {
+                const elementTop = el.getBoundingClientRect().top;
+                if (elementTop < windowHeight - 80) {
+                    el.classList.add('visible');
+                }
+            });
+        }
+
+        window.addEventListener('scroll', checkReveal);
+        window.addEventListener('load', checkReveal);
+
+        // ===== ROADMAP REVEAL =====
+        const roadmapItems = document.querySelectorAll('.roadmap-item');
+
+        function checkRoadmap() {
+            const windowHeight = window.innerHeight;
+            roadmapItems.forEach(item => {
+                const itemTop = item.getBoundingClientRect().top;
+                if (itemTop < windowHeight - 80) {
+                    item.classList.add('visible');
+                }
+            });
+        }
+
+        window.addEventListener('scroll', checkRoadmap);
+        window.addEventListener('load', checkRoadmap);
+
+        // ===== SKILL BAR ANIMATION =====
+        const skillBars = document.querySelectorAll('.skill-bar-fill');
+
+        function animateSkillBars() {
+            skillBars.forEach(bar => {
+                const rect = bar.getBoundingClientRect();
+                if (rect.top < window.innerHeight - 50) {
+                    const width = bar.getAttribute('data-width');
+                    bar.style.width = width + '%';
+                }
+            });
+        }
+
+        window.addEventListener('scroll', animateSkillBars);
+        window.addEventListener('load', animateSkillBars);
+
+        // ===== COUNTER ANIMATION =====
+        const counters = document.querySelectorAll('.stat-number');
+        let countersAnimated = false;
+
+        function animateCounters() {
+            if (countersAnimated) return;
+            const statsBar = document.querySelector('.stats-bar');
+            if (!statsBar) return;
+            const rect = statsBar.getBoundingClientRect();
+
+            if (rect.top < window.innerHeight - 50) {
+                countersAnimated = true;
+                counters.forEach(counter => {
+                    const target = parseInt(counter.getAttribute('data-count'));
+                    const duration = 1500;
+                    const start = performance.now();
+
+                    function updateCounter(currentTime) {
+                        const elapsed = currentTime - start;
+                        const progress = Math.min(elapsed / duration, 1);
+                        const eased = 1 - Math.pow(1 - progress, 3);
+                        counter.textContent = Math.round(target * eased) + '+';
+                        if (progress < 1) {
+                            requestAnimationFrame(updateCounter);
+                        }
+                    }
+                    requestAnimationFrame(updateCounter);
+                });
+            }
+        }
+
+        window.addEventListener('scroll', animateCounters);
+        window.addEventListener('load', animateCounters);
+
+        // ===== MOBILE NAV =====
+        function toggleMobileNav() {
+            const nav = document.getElementById('mobileNav');
+            const hamburger = document.getElementById('hamburger');
+            nav.classList.toggle('active');
+            hamburger.classList.toggle('active');
+            document.body.style.overflow = nav.classList.contains('active') ? 'hidden' : '';
+        }
+
+        function closeMobileNav() {
+            const nav = document.getElementById('mobileNav');
+            const hamburger = document.getElementById('hamburger');
+            nav.classList.remove('active');
+            hamburger.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // ===== SMOOTH SCROLL FOR NAV =====
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // ===== NAVBAR BACKGROUND ON SCROLL =====
+        const navBar = document.querySelector('.nav-bar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navBar.style.borderBottomColor = 'rgba(0, 255, 65, 0.1)';
+            } else {
+                navBar.style.borderBottomColor = '#1a1a1a';
+            }
+        });
+
+        // ===== RANDOM GLITCH TRIGGER =====
+        const glitchName = document.querySelector('.glitch-name');
+        function triggerGlitch() {
+            if (!glitchName) return;
+            glitchName.style.animation = 'none';
+            glitchName.offsetHeight; // force reflow
+            glitchName.style.animation = '';
+            setTimeout(triggerGlitch, Math.random() * 5000 + 3000);
+        }
+        setTimeout(triggerGlitch, 4000);
+    </script>
+
+</body>
+</html>
